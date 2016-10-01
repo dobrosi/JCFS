@@ -8,6 +8,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Arrays;
 import java.util.Set;
 
 public class JCFileSystem extends FileSystem {
@@ -32,8 +33,7 @@ public class JCFileSystem extends FileSystem {
 
 	@Override
 	public Iterable<FileStore> getFileStores() {
-		// TODO Auto-generated method stub
-		return null;
+		return Arrays.asList();
 	}
 
 	@Override

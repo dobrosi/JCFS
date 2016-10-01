@@ -15,11 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
-import java.nio.file.attribute.FileTime;
-import java.nio.file.attribute.GroupPrincipal;
-import java.nio.file.attribute.PosixFileAttributes;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
@@ -70,8 +65,7 @@ public class JCFileSystemProvider extends FileSystemProvider {
 
 	@Override
 	public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return new JCDirectoryStream();
 	}
 
 	@Override
@@ -130,81 +124,7 @@ public class JCFileSystemProvider extends FileSystemProvider {
 
 	@Override
 	public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
-		return (A) new PosixFileAttributes() {
-
-			@Override
-			public FileTime lastModifiedTime() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public FileTime lastAccessTime() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public FileTime creationTime() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public boolean isRegularFile() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean isDirectory() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean isSymbolicLink() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean isOther() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public long size() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public Object fileKey() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public UserPrincipal owner() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public GroupPrincipal group() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Set<PosixFilePermission> permissions() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-		};
+		return (A) new JCPosixFileAttributes();
 	}
 
 	@Override
