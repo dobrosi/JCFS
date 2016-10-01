@@ -11,6 +11,18 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.Set;
 
 public class JCFileSystem extends FileSystem {
+	
+	private static JCFileSystem fileSystem;
+
+	private JCFileSystem() {
+	}
+	
+	public static JCFileSystem getInstance() {
+		if(fileSystem == null) {
+			fileSystem = new JCFileSystem();
+		}
+		return fileSystem;
+	}
 
 	@Override
 	public void close() throws IOException {
@@ -26,7 +38,7 @@ public class JCFileSystem extends FileSystem {
 
 	@Override
 	public Path getPath(String arg0, String... arg1) {
-		return new JCPath(this, arg0);
+		return new JCPath(arg0);
 	}
 
 	@Override
@@ -73,7 +85,7 @@ public class JCFileSystem extends FileSystem {
 
 	@Override
 	public FileSystemProvider provider() {
-		return new JCFileSystemProvider();
+		return JCFileSystemProvider.getInstance();
 	}
 
 	@Override

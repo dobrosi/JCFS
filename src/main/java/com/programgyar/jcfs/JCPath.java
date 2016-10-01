@@ -13,12 +13,9 @@ import java.nio.file.WatchService;
 import java.util.Iterator;
 
 public class JCPath implements Path {
-
-	private JCFileSystem jcFileSystem;
 	private String filename;
 
-	public JCPath(JCFileSystem jcFileSystem, String filename) {
-		this.jcFileSystem = jcFileSystem;
+	public JCPath(String filename) {
 		this.filename = filename;
 	}
 
@@ -42,7 +39,7 @@ public class JCPath implements Path {
 	}
 
 	public FileSystem getFileSystem() {
-		return jcFileSystem;
+		return JCFileSystem.getInstance();
 	}
 
 	public Path getName(int arg0) {
@@ -99,7 +96,7 @@ public class JCPath implements Path {
 	}
 
 	public Path resolve(String filename) {
-		return new JCPath(jcFileSystem, filename);
+		return new JCPath(filename);
 	}
 
 	public Path resolveSibling(Path arg0) {

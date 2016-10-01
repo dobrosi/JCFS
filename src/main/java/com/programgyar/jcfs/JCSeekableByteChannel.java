@@ -3,8 +3,15 @@ package com.programgyar.jcfs;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Path;
 
 public class JCSeekableByteChannel implements SeekableByteChannel {
+
+	private Path path;
+
+	public JCSeekableByteChannel(Path path) {
+		this.path = path;
+	}
 
 	@Override
 	public boolean isOpen() {
@@ -26,8 +33,10 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 
 	@Override
 	public int write(ByteBuffer src) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		byte[] buffer = new byte[src.remaining()];
+		src.get(buffer);
+		System.out.println(">" + new String(buffer));
+		return buffer.length;
 	}
 
 	@Override
