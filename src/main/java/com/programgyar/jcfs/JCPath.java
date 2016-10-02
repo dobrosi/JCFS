@@ -1,6 +1,5 @@
 package com.programgyar.jcfs;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -12,13 +11,20 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Iterator;
 
+import com.google.api.services.drive.model.File;
+
 public class JCPath implements Path {
 	private String filename;
+	private File file;
 
 	public JCPath(String filename) {
 		this.filename = filename;
 	}
 
+	public JCPath(File file) {
+		this.file = file;
+	}
+	
 	public int compareTo(Path arg0) {
 		// TODO Auto-generated method stub
 		return 0;
@@ -35,7 +41,7 @@ public class JCPath implements Path {
 	}
 
 	public Path getFileName() {
-		return null;
+		return new JCPath(file == null ? filename : file.getName() );
 	}
 
 	public FileSystem getFileSystem() {
@@ -129,9 +135,8 @@ public class JCPath implements Path {
 		return null;
 	}
 
-	public File toFile() {
-		// TODO Auto-generated method stub
-		return null;
+	public java.io.File toFile() {
+		return new java.io.File(filename);
 	}
 
 	public Path toRealPath(LinkOption... options) throws IOException {
@@ -146,7 +151,10 @@ public class JCPath implements Path {
 	
 	@Override
 	public String toString() {
-		return filename;
+		return filename == null ? file.getName() : filename;
 	}
 
+	public File getFile() {
+		return file;
+	}
 }

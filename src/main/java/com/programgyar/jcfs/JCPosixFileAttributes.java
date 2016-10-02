@@ -9,6 +9,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class JCPosixFileAttributes implements PosixFileAttributes {
+	private JCPath path;
+
+	public JCPosixFileAttributes(JCPath path) {
+		this.path = path;
+	}
 
 	@Override
 	public FileTime lastModifiedTime() {
@@ -30,14 +35,16 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 
 	@Override
 	public boolean isRegularFile() {
-		// TODO Auto-generated method stub
-		return false;
+		return !isDirectory();
 	}
 
 	@Override
 	public boolean isDirectory() {
-		// TODO Auto-generated method stub
-		return true;
+		if(path.getFile() == null) {
+			return true;
+		} else {
+			 return path.getFile().getMimeType().equals("application/vnd.google-apps.folder");
+		}
 	}
 
 	@Override
@@ -77,5 +84,8 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 	public Set<PosixFilePermission> permissions() {
 		return new HashSet<>();
 	}
-
+	
+	public JCPath getPath() {
+		return path;
+	}
 }
