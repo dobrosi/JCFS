@@ -15,11 +15,29 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
 
 public class JCFileSystemProvider extends FileSystemProvider {
+
+	private static JCFileSystemProvider fileSystemProvider;
+
+	private JCFileSystemProvider() {
+	}
+
+	public static JCFileSystemProvider getInstance() {
+
+		if (fileSystemProvider == null) {
+			fileSystemProvider = new JCFileSystemProvider();
+		}
+		return fileSystemProvider;
+	}
 
 	@Override
 	public String getScheme() {
@@ -46,16 +64,13 @@ public class JCFileSystemProvider extends FileSystemProvider {
 	}
 
 	@Override
-	public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)
-			throws IOException {
-		// TODO Auto-generated method stub
-		return new JCSeekableByteChannel();
+	public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs) throws IOException {
+		return new JCSeekableByteChannel(path);
 	}
 
 	@Override
 	public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return new JCDirectoryStream();
 	}
 
 	@Override
@@ -111,12 +126,9 @@ public class JCFileSystemProvider extends FileSystemProvider {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 	@Override
-	public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options)
-			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+	public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
+		return (A) new JCPosixFileAttributes((JCPath) path);
 	}
 
 	@Override

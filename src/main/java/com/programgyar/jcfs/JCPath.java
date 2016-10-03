@@ -1,6 +1,5 @@
 package com.programgyar.jcfs;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -12,16 +11,20 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Iterator;
 
+import com.google.api.services.drive.model.File;
+
 public class JCPath implements Path {
-
-	private JCFileSystem jcFileSystem;
 	private String filename;
+	private File file;
 
-	public JCPath(JCFileSystem jcFileSystem, String filename) {
-		this.jcFileSystem = jcFileSystem;
+	public JCPath(String filename) {
 		this.filename = filename;
 	}
 
+	public JCPath(File file) {
+		this.file = file;
+	}
+	
 	public int compareTo(Path arg0) {
 		// TODO Auto-generated method stub
 		return 0;
@@ -38,11 +41,11 @@ public class JCPath implements Path {
 	}
 
 	public Path getFileName() {
-		return null;
+		return new JCPath(file == null ? filename : file.getName() );
 	}
 
 	public FileSystem getFileSystem() {
-		return jcFileSystem;
+		return JCFileSystem.getInstance();
 	}
 
 	public Path getName(int arg0) {
@@ -99,7 +102,7 @@ public class JCPath implements Path {
 	}
 
 	public Path resolve(String filename) {
-		return new JCPath(jcFileSystem, filename);
+		return new JCPath(filename);
 	}
 
 	public Path resolveSibling(Path arg0) {
@@ -132,9 +135,8 @@ public class JCPath implements Path {
 		return null;
 	}
 
-	public File toFile() {
-		// TODO Auto-generated method stub
-		return null;
+	public java.io.File toFile() {
+		return new java.io.File(filename);
 	}
 
 	public Path toRealPath(LinkOption... options) throws IOException {
@@ -146,5 +148,13 @@ public class JCPath implements Path {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return filename == null ? file.getName() : filename;
+	}
 
+	public File getFile() {
+		return file;
+	}
 }

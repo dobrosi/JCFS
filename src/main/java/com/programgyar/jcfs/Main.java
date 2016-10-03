@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import co.paralleluniverse.javafs.JavaFS;
 
 public class Main {
 
 	public static void main(String[] args) {
-		JCFileSystem jcFileSystem = new JCFileSystem();
+		JCFileSystem jcFileSystem = JCFileSystem.getInstance();
 		Path foo = jcFileSystem.getPath("/foo");
 		
 		try {
@@ -23,6 +28,15 @@ public class Main {
 		}
 
 		System.out.println("done.");
+		
+		Map<String, String> options = new HashMap<>();
+		
+		try {
+			JavaFS.mount(jcFileSystem, Paths.get("test-drive"), false, true, options);
+			Thread.sleep(Long.MAX_VALUE);
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
