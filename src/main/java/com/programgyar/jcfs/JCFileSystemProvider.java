@@ -39,6 +39,19 @@ public class JCFileSystemProvider extends FileSystemProvider {
 		return fileSystemProvider;
 	}
 
+	private static JCFileSystemProvider fileSystemProvider;
+
+	private JCFileSystemProvider() {
+	}
+
+	public static JCFileSystemProvider getInstance() {
+
+		if (fileSystemProvider == null) {
+			fileSystemProvider = new JCFileSystemProvider();
+		}
+		return fileSystemProvider;
+	}
+
 	@Override
 	public String getScheme() {
 		// TODO Auto-generated method stub
