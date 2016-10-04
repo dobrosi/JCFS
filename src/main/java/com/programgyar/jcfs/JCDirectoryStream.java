@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 public class JCDirectoryStream implements DirectoryStream<Path> {
 
@@ -15,17 +16,9 @@ public class JCDirectoryStream implements DirectoryStream<Path> {
 
 	@Override
 	public Iterator<Path> iterator() {
-		try {
-			return GoogleDriveHandler.getFileList("/").stream().map(p -> {
-				JCPath res = new JCPath(p);
-				
-				return (Path) res;
-			}).iterator();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+		return (Iterator<Path>)(Iterator<?>)JCFileSystem.getStore().values().stream().map(f -> {
+			JCPath res = new JCPath(f.getId(), f.getName());
+			return res;
+		}).collect(Collectors.toList()).iterator();
 	}
-
 }

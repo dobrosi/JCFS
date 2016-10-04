@@ -8,6 +8,8 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.api.services.drive.model.File;
+
 public class JCPosixFileAttributes implements PosixFileAttributes {
 	private JCPath path;
 
@@ -40,11 +42,16 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 
 	@Override
 	public boolean isDirectory() {
-		if(path.getFile() == null) {
+		if(path instanceof JCPath && ((JCPath) path).getFilename().equals("/")) {
 			return true;
-		} else {
-			 return path.getFile().getMimeType().equals("application/vnd.google-apps.folder");
 		}
+		File f = JCFileSystem.getStore().get(path.getFilename());
+		if( f == null ) {
+			return false;
+		} else {
+			 return f.getMimeType().equals("application/vnd.google-apps.folder");
+		}
+//		return true;
 	}
 
 	@Override
@@ -84,7 +91,7 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 	public Set<PosixFilePermission> permissions() {
 		return new HashSet<>();
 	}
-	
+
 	public JCPath getPath() {
 		return path;
 	}

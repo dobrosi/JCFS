@@ -1,11 +1,7 @@
 package com.programgyar.jcfs;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,17 +11,17 @@ public class Main {
 
 	public static void main(String[] args) {
 		JCFileSystem jcFileSystem = JCFileSystem.getInstance();
-		Path foo = jcFileSystem.getPath("/foo");
-		
-		try {
-			Files.createFile(foo);
-			
-			Path hello = foo.resolve("hello.txt"); // /foo/hello.txt
-			Files.write(hello, Arrays.asList("hello world"), StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		Path foo = jcFileSystem.getPath("/foo");
+//		
+//		try {
+//			Files.createFile(foo);
+//			
+//			Path hello = foo.resolve("hello.txt"); // /foo/hello.txt
+//			Files.write(hello, Arrays.asList("hello world"), StandardCharsets.UTF_8);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 		System.out.println("done.");
 		
