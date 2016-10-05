@@ -11,10 +11,10 @@ import java.util.Set;
 import com.google.api.services.drive.model.File;
 
 public class JCPosixFileAttributes implements PosixFileAttributes {
-	private JCPath path;
+	private String fileId;
 
-	public JCPosixFileAttributes(JCPath path) {
-		this.path = path;
+	public JCPosixFileAttributes(String fileId) {
+		this.fileId = fileId;
 	}
 
 	@Override
@@ -42,16 +42,13 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 
 	@Override
 	public boolean isDirectory() {
-		if(path instanceof JCPath && ((JCPath) path).getFilename().equals("/")) {
-			return true;
-		}
-		File f = JCFileSystem.getStore().get(path.getFilename());
+		File f = JCFileSystem.get(fileId);
 		if( f == null ) {
-			return false;
+			return true;
 		} else {
 			 return f.getMimeType().equals("application/vnd.google-apps.folder");
 		}
-//		return true;
+		//return true;
 	}
 
 	@Override
@@ -68,8 +65,16 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 
 	@Override
 	public long size() {
-		// TODO Auto-generated method stub
-		return 0;
+		if(fileId == null) {
+			return 0;
+		}
+		File f = JCFileSystem.get(fileId);
+		if(f == null) {
+			return 0;
+		}
+		Long size = f.getSize();
+		
+		return size == null ? 0 : size;
 	}
 
 	@Override
@@ -90,9 +95,5 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 	@Override
 	public Set<PosixFilePermission> permissions() {
 		return new HashSet<>();
-	}
-
-	public JCPath getPath() {
-		return path;
 	}
 }

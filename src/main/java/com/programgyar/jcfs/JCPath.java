@@ -11,12 +11,17 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Iterator;
 
+import com.google.api.services.drive.model.File;
+
 public class JCPath implements Path {
-	private String fileId;
+	private File file;
 	private String filename;
 
-	public JCPath(String fileId, String filename) {
-		this.fileId = fileId;
+	public JCPath(File file) {
+		this.file = file;
+	}
+
+	public JCPath(String filename) {
 		this.filename = filename;
 	}
 
@@ -36,7 +41,7 @@ public class JCPath implements Path {
 	}
 
 	public Path getFileName() {
-		return new JCPath(fileId, filename);
+		return this;
 	}
 
 	public FileSystem getFileSystem() {
@@ -97,7 +102,7 @@ public class JCPath implements Path {
 	}
 
 	public Path resolve(String filename) {
-		return new JCPath(fileId, filename);
+		return this;
 	}
 
 	public Path resolveSibling(Path arg0) {
@@ -131,7 +136,7 @@ public class JCPath implements Path {
 	}
 
 	public java.io.File toFile() {
-		return new java.io.File(filename);
+		return new java.io.File(file.getName());
 	}
 
 	public Path toRealPath(LinkOption... options) throws IOException {
@@ -143,17 +148,16 @@ public class JCPath implements Path {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public File getFile() {
+		return file;
+	}
 	
 	@Override
 	public String toString() {
-		return fileId;
-	}
-
-	public String getFileId() {
-		return fileId;
-	}
-
-	public String getFilename() {
-		return filename;
+		if(file == null) {
+			return filename;
+		}
+		return "/" + file.getId();
 	}
 }

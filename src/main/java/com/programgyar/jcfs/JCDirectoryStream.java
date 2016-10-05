@@ -16,9 +16,6 @@ public class JCDirectoryStream implements DirectoryStream<Path> {
 
 	@Override
 	public Iterator<Path> iterator() {
-		return (Iterator<Path>)(Iterator<?>)JCFileSystem.getStore().values().stream().map(f -> {
-			JCPath res = new JCPath(f.getId(), f.getName());
-			return res;
-		}).collect(Collectors.toList()).iterator();
+		return (Iterator<Path>)(Iterator<?>)JCFileSystem.getStore().values().stream().map(f -> new JCPath(f)).collect(Collectors.toList()).iterator();
 	}
 }

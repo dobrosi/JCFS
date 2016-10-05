@@ -123,7 +123,7 @@ public class JCFileSystemProvider extends FileSystemProvider {
 	}
 	@Override
 	public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
-		return (A) new JCPosixFileAttributes((JCPath) path);
+		return (A) new JCPosixFileAttributes(path.toString());
 	}
 
 	@Override

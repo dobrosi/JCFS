@@ -1,6 +1,7 @@
 package com.programgyar.jcfs;
 
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -44,7 +45,11 @@ public class JCFileSystem extends FileSystem {
 
 	@Override
 	public Path getPath(String arg0, String... arg1) {
-		return new JCPath(null, arg0);
+		File f = JCFileSystem.get(arg0);
+		if(f == null) {
+			return new JCPath(arg0);
+		}
+		return new JCPath(f);
 	}
 
 	@Override
@@ -104,13 +109,17 @@ public class JCFileSystem extends FileSystem {
 		if (store == null) {
 			store = new HashMap<>();
 			try {
-				GoogleDriveHandler.getFileList("/").forEach(f -> store.put(f.getId(), f));
+				GoogleDriveHandler.getFileList("/").forEach(f -> store.put("/" + f.getId(), f));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return store;
+	}
+
+	public static File get(String fileId) {
+		return getStore().get(fileId);
 	}
 
 }
