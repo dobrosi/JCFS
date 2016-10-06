@@ -1,6 +1,8 @@
 package com.programgyar.jcfs;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Path;
@@ -27,8 +29,9 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 
 	@Override
 	public int read(ByteBuffer dst) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		ByteArrayOutputStream out = (ByteArrayOutputStream) GoogleDriveHandler.readFile(path.toString());
+		dst.wrap(out.toByteArray());
+		return out.size();
 	}
 
 	@Override

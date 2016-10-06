@@ -1,18 +1,23 @@
 package com.programgyar.jcfs;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.core.base.GeneratorBase;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -46,7 +51,8 @@ public class GoogleDriveHandler {
 	 * If modifying these scopes, delete your previously saved credentials at
 	 * ~/.credentials/drive-java-quickstart
 	 */
-	private static final List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE_METADATA_READONLY);
+	private static final List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE_METADATA_READONLY, DriveScopes.DRIVE,
+			DriveScopes.DRIVE_APPDATA, DriveScopes.DRIVE_FILE);
 
 	static {
 		try {
@@ -92,29 +98,35 @@ public class GoogleDriveHandler {
 		// Build a new authorized API client service.
 		Drive service = getDriveService();
 
-	    List<File> result = new ArrayList<File>();
-	    Files.List request = service.files().list();
+		List<File> result = new ArrayList<File>();
+		Files.List request = service.files().list();
 
-	    do {
-	      try {
-	        FileList files = request.execute();
+		do {
+			try {
+				FileList files = request.execute();
 
-	        result.addAll(files.getFiles());
-	        request.setPageToken(files.getNextPageToken());
-	      } catch (IOException e) {
-	        System.out.println("An error occurred: " + e);
-	        request.setPageToken(null);
-	      }
-	    } while (request.getPageToken() != null &&
-	             request.getPageToken().length() > 0);
-	    
-	    result.forEach(f -> System.out.println(f.getName() + " - " + f.getMimeType()));
+				result.addAll(files.getItems());
+				request.setPageToken(files.getNextPageToken());
+			} catch (IOException e) {
+				System.out.println("An error occurred: " + e);
+				request.setPageToken(null);
+			}
+		} while (request.getPageToken() != null && request.getPageToken().length() > 0);
 
-	    return result;
+		return result;
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		getFileList(null);
 	}
 
+	public static OutputStream readFile(String filename) throws IOException {
+		return readFile(JCFileSystem.getByFilename(filename));
+	}
+
+	public static OutputStream readFile(File file) throws IOException {
+		OutputStream outputStream = new ByteArrayOutputStream();
+		getDriveService().files().get(file.getId()).executeMediaAndDownloadTo(outputStream);
+		return outputStream;
+	}
 }

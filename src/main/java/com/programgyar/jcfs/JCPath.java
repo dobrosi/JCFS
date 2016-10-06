@@ -136,7 +136,7 @@ public class JCPath implements Path {
 	}
 
 	public java.io.File toFile() {
-		return new java.io.File(file.getName());
+		return new java.io.File(file.getOriginalFilename());
 	}
 
 	public Path toRealPath(LinkOption... options) throws IOException {
@@ -158,6 +158,6 @@ public class JCPath implements Path {
 		if(file == null) {
 			return filename;
 		}
-		return "/" + file.getId();
+		return "/" + file.getOriginalFilename();
 	}
 }

@@ -1,7 +1,6 @@
 package com.programgyar.jcfs;
 
 import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -21,6 +20,8 @@ public class JCFileSystem extends FileSystem {
 	private static JCFileSystem fileSystem;
 
 	private static Map<String, File> store;
+
+	private static Map<String, String> filenames = new HashMap<>();
 
 	private JCFileSystem() {
 	}
@@ -45,8 +46,8 @@ public class JCFileSystem extends FileSystem {
 
 	@Override
 	public Path getPath(String arg0, String... arg1) {
-		File f = JCFileSystem.get(arg0);
-		if(f == null) {
+		File f = JCFileSystem.getByFilename(arg0);
+		if (f == null) {
 			return new JCPath(arg0);
 		}
 		return new JCPath(f);
@@ -109,7 +110,10 @@ public class JCFileSystem extends FileSystem {
 		if (store == null) {
 			store = new HashMap<>();
 			try {
-				GoogleDriveHandler.getFileList("/").forEach(f -> store.put("/" + f.getId(), f));
+				GoogleDriveHandler.getFileList("/").forEach(f -> {
+					store.put(f.getId(), f);
+					filenames.put("/" + f.getOriginalFilename(), f.getId());
+				});
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -122,4 +126,29 @@ public class JCFileSystem extends FileSystem {
 		return getStore().get(fileId);
 	}
 
+	public static File getByFilename(String filename) {
+		return getStore().get(filenames.get(filename));
+	}
+
+	public static long getFileSize(String filename) {
+		if (filename == null) {
+			return 0;
+		}
+		File f = JCFileSystem.getByFilename(filename);
+		if (f == null) {
+			return 0;
+		}
+		Long size = f.getFileSize();
+
+		return size == null ? 0 : size;
+	}
+
+	public static boolean isDirectory(String filename) {
+		File f = JCFileSystem.getByFilename(filename);
+		if (f == null) {
+			return true;
+		} else {
+			return f.getMimeType().equals("application/vnd.google-apps.folder");
+		}
+	}
 }

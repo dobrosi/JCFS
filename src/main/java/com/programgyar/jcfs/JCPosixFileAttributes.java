@@ -5,16 +5,17 @@ import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.UserPrincipal;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.google.api.services.drive.model.File;
 
 public class JCPosixFileAttributes implements PosixFileAttributes {
-	private String fileId;
+	private String filename;
 
-	public JCPosixFileAttributes(String fileId) {
-		this.fileId = fileId;
+	public JCPosixFileAttributes(String filename) {
+		this.filename = filename;
 	}
 
 	@Override
@@ -42,12 +43,7 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 
 	@Override
 	public boolean isDirectory() {
-		File f = JCFileSystem.get(fileId);
-		if( f == null ) {
-			return true;
-		} else {
-			 return f.getMimeType().equals("application/vnd.google-apps.folder");
-		}
+		return JCFileSystem.isDirectory(filename);
 		//return true;
 	}
 
@@ -65,16 +61,7 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 
 	@Override
 	public long size() {
-		if(fileId == null) {
-			return 0;
-		}
-		File f = JCFileSystem.get(fileId);
-		if(f == null) {
-			return 0;
-		}
-		Long size = f.getSize();
-		
-		return size == null ? 0 : size;
+		return JCFileSystem.getFileSize(filename);
 	}
 
 	@Override
@@ -94,6 +81,8 @@ public class JCPosixFileAttributes implements PosixFileAttributes {
 
 	@Override
 	public Set<PosixFilePermission> permissions() {
-		return new HashSet<>();
+		HashSet<PosixFilePermission> res = new HashSet<>();
+		res.addAll(Arrays.asList(PosixFilePermission.values()));
+		return res;
 	}
 }
