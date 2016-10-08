@@ -1,23 +1,18 @@
 package com.programgyar.jcfs;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.core.base.GeneratorBase;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -120,13 +115,11 @@ public class GoogleDriveHandler {
 		getFileList(null);
 	}
 
-	public static OutputStream readFile(String filename) throws IOException {
+	public static InputStream readFile(String filename) throws IOException {
 		return readFile(JCFileSystem.getByFilename(filename));
 	}
 
-	public static OutputStream readFile(File file) throws IOException {
-		OutputStream outputStream = new ByteArrayOutputStream();
-		getDriveService().files().get(file.getId()).executeMediaAndDownloadTo(outputStream);
-		return outputStream;
+	public static InputStream readFile(File file) throws IOException {
+		return getDriveService().files().get(file.getId()).executeMediaAsInputStream();
 	}
 }
