@@ -1,20 +1,24 @@
 package com.programgyar.jcfs;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Path;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.api.services.drive.model.File;
 
 public class JCSeekableByteChannel implements SeekableByteChannel {
 
 	private Path path;
-	private InputStream in;
 	private File file;
 	private long position;
 	private Long filesize;
+	private ReadableByteChannel channel;
+	private long counter;
 
 	public JCSeekableByteChannel(Path path) {
 		this.path = path;
@@ -22,28 +26,62 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 
 	@Override
 	public boolean isOpen() {
-		return in != null;
+		return channel != null;
 	}
 
 	@Override
 	public void close() throws IOException {
-		in = null;
+		channel.close();
+		channel = null;
+		counter = 0;
+		filesize = 0L;
+		blocks.clear();
 	}
 
 	@Override
-	public int read(ByteBuffer dst) throws IOException {
-		if (in == null) {
+	public synchronized int read(ByteBuffer dst) throws IOException {
+		if (channel == null) {
 			file = JCFileSystem.getByFilename(path.toString());
+			channel = Channels.newChannel(GoogleDriveHandler.readFile(file));
 			filesize = file.getFileSize();
-			in = GoogleDriveHandler.readFile(file);
-			position = 0l;
 		}
-		byte[] bs = new byte[1024];
-		int len = in.read(bs, (int) position, (int) Math.min(1024, filesize - position));
-		dst.put(bs, (int) position, len);
-		position += len;
-		return len;
+
+		int n = 0;
+
+		long nextIndex = position + dst.capacity();
+		ByteBuffer buf = ByteBuffer.allocateDirect((int)(nextIndex - counter));
+		do {
+			
+			int num = channel.read(buf);
+			
+			if (num > 0) {
+				n += num;
+				counter += num;
+				
+				if(counter >= filesize) {
+					break;
+				}
+			}
+		} while (n != buf.capacity());
+		blocks.add(new Block(position, nextIndex ,buf));
+		
+		dst.put(getBlock(position, dst.capacity()));
+
+		return n;
 	}
+	
+	private byte[] getBlock(long position, int capacity) {
+		byte[] res = new byte[capacity];
+		
+		int i = 0;
+		while(i < capacity) {
+		//	blocks.stream().filter(b -> b.firstIndex >= position && )
+		}
+		
+		return res;		
+	}
+
+	private Set<Block> blocks = new TreeSet<>((c1, c2) -> (int)(c1.firstIndex - c2.firstIndex));
 
 	@Override
 	public int write(ByteBuffer src) throws IOException {
@@ -73,6 +111,18 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 	public SeekableByteChannel truncate(long size) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	class Block {
+		long firstIndex;
+		long lastIndex;
+		ByteBuffer bytes;
+		public Block(long firstIndex, long lastIndex, ByteBuffer bytes) {
+			super();
+			this.firstIndex = firstIndex;
+			this.lastIndex = lastIndex;
+			this.bytes = bytes;
+		}
 	}
 
 }
