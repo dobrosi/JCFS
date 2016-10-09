@@ -19,6 +19,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Get;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -115,11 +116,13 @@ public class GoogleDriveHandler {
 		getFileList(null);
 	}
 
-	public static InputStream readFile(String filename) throws IOException {
-		return readFile(JCFileSystem.getByFilename(filename));
+	public static InputStream readFile(String filename, String range) throws IOException {
+		return readFile(JCFileSystem.getByFilename(filename), range);
 	}
 
-	public static InputStream readFile(File file) throws IOException {
-		return getDriveService().files().get(file.getId()).executeMediaAsInputStream();
+	public static InputStream readFile(File file, String range) throws IOException {
+		Get get = getDriveService().files().get(file.getId());
+		get.getRequestHeaders().setRange(range);
+		return get.executeMediaAsInputStream();
 	}
 }
