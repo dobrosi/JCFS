@@ -64,7 +64,6 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 	}
 
 	public void startReaderThread() throws IOException {
-
 		file = JCFileSystem.getByFilename(path.toString());
 		tempFile = java.io.File.createTempFile(file.getOriginalFilename(), "");
 		InputStream in = GoogleDriveHandler.readFile(file, null);
@@ -77,7 +76,6 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 			}
 		};
 		new Thread(r).start();
-
 	}
 
 	@Override
