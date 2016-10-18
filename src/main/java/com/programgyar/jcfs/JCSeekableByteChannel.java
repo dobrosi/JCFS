@@ -17,6 +17,7 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 	private File file;
 	private java.io.File tempFile;
 	private long position;
+	private boolean downloading;
 
 	public JCSeekableByteChannel(Path path) {
 		this.path = path;
@@ -36,34 +37,41 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 	}
 
 	@Override
-	public synchronized int read(ByteBuffer dst) throws IOException {
+	public int read(ByteBuffer dst) throws IOException {
+		long p = position();
 		if (file == null) {
 			startReaderThread();
 		}
 
 		int capacity = dst.capacity();
-		long endPosition = Math.min(tempFile.length(), position + capacity);
-		long waitLength = endPosition - position;
+		long endPosition = Math.min(file.getFileSize(), p + capacity);
+		long waitLength = Math.min(capacity, endPosition - p);
 
-		while (endPosition < tempFile.length()) {
+		do {
 			System.out.print(".");
-		}
-		
+		} while(downloading);
+		//} while (file.getFileSize() != (tempFile = new java.io.File(tempFile.getPath())).length());
+
 		RandomAccessFile randomAccessFile = new RandomAccessFile(tempFile, "r");
 		FileChannel fileChannel = randomAccessFile.getChannel();
-		
-		int num = 0;
+		randomAccessFile.seek(p);
+
+		long num = 0;
 		do {
-			num += fileChannel.read(dst);
-		} while((num < waitLength));
-		
+			int i = fileChannel.read(dst);
+			if(i > 0) {
+				num += i;
+			}
+		} while (num != waitLength && fileChannel.position() != num);
+
 		fileChannel.close();
 		randomAccessFile.close();
-		
-		return num;
+
+		return (int) waitLength;
 	}
 
 	public void startReaderThread() throws IOException {
+		downloading = true;
 		file = JCFileSystem.getByFilename(path.toString());
 		tempFile = java.io.File.createTempFile(file.getOriginalFilename(), "");
 		InputStream in = GoogleDriveHandler.readFile(file, null);
@@ -71,6 +79,8 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 		Runnable r = () -> {
 			try {
 				IOUtils.copy(in, out);
+				System.out.println("FINISHED DOWNLOADING");
+				downloading = false;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
