@@ -17,7 +17,6 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 	private File file;
 	private java.io.File tempFile;
 	private long position;
-	private boolean downloading;
 
 	public JCSeekableByteChannel(Path path) {
 		this.path = path;
@@ -49,8 +48,7 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 
 		do {
 			System.out.print(".");
-		} while(downloading);
-		//} while (file.getFileSize() != (tempFile = new java.io.File(tempFile.getPath())).length());
+		} while (file.getFileSize() != (tempFile = new java.io.File(tempFile.getPath())).length());
 
 		RandomAccessFile randomAccessFile = new RandomAccessFile(tempFile, "r");
 		FileChannel fileChannel = randomAccessFile.getChannel();
@@ -70,8 +68,7 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 		return (int) waitLength;
 	}
 
-	public void startReaderThread() throws IOException {
-		downloading = true;
+	public synchronized void startReaderThread() throws IOException {
 		file = JCFileSystem.getByFilename(path.toString());
 		tempFile = java.io.File.createTempFile(file.getOriginalFilename(), "");
 		InputStream in = GoogleDriveHandler.readFile(file, null);
@@ -80,7 +77,6 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 			try {
 				IOUtils.copy(in, out);
 				System.out.println("FINISHED DOWNLOADING");
-				downloading = false;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
