@@ -65,7 +65,7 @@ public class JCSeekableByteChannel implements SeekableByteChannel {
 		fileChannel.close();
 		randomAccessFile.close();
 
-		return (int) waitLength;
+		return (int) num;
 	}
 
 	public synchronized void startReaderThread() throws IOException {
